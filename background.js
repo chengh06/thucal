@@ -1,5 +1,3 @@
-var URL_XK_ROOT='zhjw.cic.tsinghua.edu.cn/xkBks.vxkBksXkbBs.do?m=main';
-
 function urlToTermId(url){
     var re=/zhjw\.cic\.tsinghua\.edu\.cn\/syxk\.vsyxkKcapb\.do\?m=ztkbSearch&p_xnxq=([0-9\-]+)/;
     var x=re.exec(url);
@@ -26,13 +24,17 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 });
 chrome.pageAction.onClicked.addListener(main);
 
-////
+////Main function
 function main(tab){
     console.log(tab);
     var termId=urlToTermId(tab.url);
     console.log(termId);
-    chrome.tabs.executeScript(tab.id, {
-        allFrames: false,
-        file: "parse.js"
+    chrome.tabs.executeScript(null, {
+        file: 'parse.js',
+        allFrames: true,
     });
 }
+function afterParse(courseTable){
+    console.log(courseTable);//TODO: process and export to google calendar
+}
+chrome.extension.onRequest.addListener(afterParse);
