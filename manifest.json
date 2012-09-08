@@ -1,0 +1,20 @@
+/* vim: set filetype=javascript : */ 
+{
+    "name": "thucal",
+    "version": "0.1",
+    "description": "Dummy Description",
+    "manifest_version": 2,
+
+    "background": { "page": "background.html" },
+    "page_action":{
+        "default_icon": "icons/icon.png", 
+        "default_title": "Export to Google Calendar"
+        /* "default_popup": "popup.html" */
+    },
+    "permissions":[
+        /*"background",*/
+        "tabs",
+        "http://portal.tsinghua.edu.cn/", "https://portal.tsinghua.edu.cn/",
+        "http://zhjw.cic.tsinghua.edu.cn/", "https://zhjw.cic.tsinghua.edu.cn/"
+    ]
+}
