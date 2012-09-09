@@ -74,7 +74,7 @@ function parseCourse(titleElem){
             infoStr=infoElem.data;
             match=/\((.*周)；(.*)\)/.exec(infoStr);
             ret.lab=null;
-            ret.loc=match[2] || "";
+            //ret.loc=match[2] || "";
             break;
         case 'blue_red_none':
             infoStr=infoElem.innerHTML;
@@ -83,10 +83,11 @@ function parseCourse(titleElem){
                 name: match[1] || "",
                 time: match[6] || "", //TODO: parse time and hash/merge same lab entries if available
             };
-            ret.loc=match[2] || "";
+            //ret.loc=match[2] || "";
             break;
     }
     ret.week=parseWeek(infoStr);
+    ret.info=infoStr;
     return ret;
 }
 
