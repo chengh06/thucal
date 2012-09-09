@@ -1,5 +1,5 @@
 function parseWeek(weekStr){
-    var r=/(第([\d,-]+)|全|前八|后八)周/.exec(weekStr);
+    var r=/(第([\d,-]+)|全|前八|后八|单|双)周/.exec(weekStr);
     if(r===null) return null;
 
     var ret=[];
@@ -20,6 +20,14 @@ function parseWeek(weekStr){
                 ret.push(i);
             }
             break;
+        case '单':
+            for(var i=1;i<=15;i+=2){
+                ret.push(i);
+            }
+        case '双':
+            for(var i=2;i<=16;i+=2){
+                ret.push(i);
+            }
         case '第':
             //complicated case: "1-4,6,8-9,11" => [1, 2, 3, 4, 6, 8, 9, 11]
             var rangeStrList=r[2].split(',');
@@ -106,4 +114,15 @@ function parseAllCourses(){
     return ret;
 }
 
-chrome.extension.sendRequest(parseAllCourses());
+function getTermId(){
+    var el=document.getElementsByName('p_xnxq')[0];
+    if(!(el instanceof HTMLInputElement)){
+        return null;
+    }
+    return el.value;
+}
+
+chrome.extension.sendRequest({
+    termId: getTermId(),
+    courseTable: parseAllCourses()
+});

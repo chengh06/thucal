@@ -1,0 +1,2 @@
+//alert('extra');
+ChromeExOAuth.initCallbackPage();

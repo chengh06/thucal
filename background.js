@@ -29,12 +29,14 @@ function main(tab){
     console.log(tab);
     var termId=urlToTermId(tab.url);
     console.log(termId);
+
+    chrome.extension.onRequest.addListener(afterParse);
     chrome.tabs.executeScript(null, {
         file: 'parse.js',
         allFrames: true,
     });
 }
-function afterParse(courseTable){
-    console.log(courseTable);//TODO: process and export to google calendar
+function afterParse(data){
+    console.log(data);//TODO: process and export to google calendar
+    chrome.extension.onRequest.removeListener(afterParse);
 }
-chrome.extension.onRequest.addListener(afterParse);
