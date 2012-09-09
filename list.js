@@ -9,9 +9,6 @@ function stringify(parameters) {
   return params.join('&');
 };
 
-var d1=new Date();
-var d2=new Date(d1);
-d2.setFullYear(d1.getFullYear()+2);
 
 function date2yyyymmdd(d){
     return /(\d\d\d\d)-(\d\d)-(\d\d)/.exec(d.toISOString()).slice(1).join('')
@@ -40,8 +37,9 @@ function afterInitialList(r){
     if(match===null) throw Error('这不科学！afterInitialList找不到token');
     params.token=match[1];
 
-    console.log(d1);
-    console.log(d2);
+    var d1=new Date();
+    var d2=new Date(d1);
+    d2.setFullYear(d1.getFullYear()+2);
     params['p_start_date']=date2yyyymmdd(d1);
     params['p_end_date']=date2yyyymmdd(d2);
 
@@ -59,10 +57,18 @@ function afterInitialList(r){
     xhr.send(stringify(params));
 }
 function afterListAll(r){
-    console.log(r);
+    //load it into DOM
+    var re=/<form name="frm"[^]*\/form>/m;
+    var contentHtml=re.exec(r)[0];
+    contentHtml=contentHtml.replace(/<\/?div>/g, '');
+    var el=document.body.appendChild(document.createElement('div'));
+    el.id='thucal';
+    el.style.display='none';
+    el.innerHTML=contentHtml;
+
+    //extract data
+    ;
 }
 
 alert('list');
-console.log(d1);
-console.log(d2);
 getList();
