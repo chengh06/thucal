@@ -24,7 +24,14 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab){
 });
 chrome.pageAction.onClicked.addListener(main);
 
-////Main function
+/**
+ * Main logic
+ * <ul>
+ * <li> parse the course grid </li>
+ * <li> match it to course time listing </li>
+ * <li> generate events and upload to google calendar </li>
+ * </ul>
+ */
 function main(tab){
     console.log(tab);
     var termId=urlToTermId(tab.url);
@@ -33,10 +40,19 @@ function main(tab){
     chrome.extension.onRequest.addListener(afterParse);
     chrome.tabs.executeScript(null, {
         file: 'parse.js',
-        allFrames: true,
+        allFrames: true
     });
 }
 function afterParse(data){
-    console.log(data);//TODO: process and export to google calendar
+    console.log(data);
     chrome.extension.onRequest.removeListener(afterParse);
+
+    chrome.extension.onRequest.addListener(afterList);
+    chrome.tabs.executeScript(null, {
+        file: 'list.js',
+        allFrames: true
+    });
+}
+function afterList(data){
+    console.log(data);
 }

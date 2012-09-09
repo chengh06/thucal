@@ -24,10 +24,12 @@ function parseWeek(weekStr){
             for(var i=1;i<=15;i+=2){
                 ret.push(i);
             }
+            break;
         case '双':
             for(var i=2;i<=16;i+=2){
                 ret.push(i);
             }
+            break;
         case '第':
             //complicated case: "1-4,6,8-9,11" => [1, 2, 3, 4, 6, 8, 9, 11]
             var rangeStrList=r[2].split(',');
