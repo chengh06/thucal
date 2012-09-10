@@ -275,9 +275,9 @@ function afterAuthorize(){
     var match=/^(\d+)-(\d+)-(\d+)/.exec(window['termId']);
     var termName='THU:'+match[1]+'-'+match[2];
     switch(parseInt(match[3], 10)){
-        case 1: termName+='秋'; break;
-        case 2: termName+='春'; break;
-        case 3: termName+='夏'; break;
+        case 1: termName+='\u79CB'; break;
+        case 2: termName+='\u6625'; break;
+        case 3: termName+='\u590F'; break;
     }
     createCalendar(
         termName+'['+(new goog.date.DateTime()).toIsoString()+']',
