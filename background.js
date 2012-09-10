@@ -293,6 +293,8 @@ function uploadFC(){
         console.log(window['FC'].length);
         var fc=window['FC'].pop();
         uploadFC1(fc);
+    }else{
+        chrome.tabs.create({url: 'ui.html'});
     }
 }
 function uploadFC1(fc){
