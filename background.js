@@ -274,7 +274,7 @@ function upload(){
 function afterAuthorize(){
     var match=/^(\d+)-(\d+)-(\d+)/.exec(window['termId']);
     var termName='THU:'+match[1]+'-'+match[2];
-    switch(parseInt(match[2], 10)){
+    switch(parseInt(match[3], 10)){
         case 1: termName+='秋'; break;
         case 2: termName+='春'; break;
         case 3: termName+='夏'; break;
