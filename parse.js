@@ -120,12 +120,16 @@ function parseAllCourses(){
 function getTermId(){
     var el=document.getElementsByName('p_xnxq')[0];
     if(!(el instanceof HTMLInputElement)){
-        return null;
+        throw Error('这不科学！没有学期？');
     }
     return el.value;
 }
 
-chrome.extension.sendRequest({
-    termId: getTermId(),
+try{
+    chrome.extension.sendRequest({
+        termId: getTermId(),
     courseTable: parseAllCourses()
-});
+    });
+}catch(e){
+    chrome.extension.sendRequest("error");
+}

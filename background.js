@@ -69,9 +69,9 @@ chrome.pageAction.onClicked.addListener(main);
  * </ul>
  */
 function main(tab){
-    console.log(tab);
+    //console.log(tab);
     window['termId']=urlToTermId(tab.url);
-    console.log(window['termId']);
+    //console.log(window['termId']);
 
     chrome.extension.onRequest.addListener(afterParse);
     chrome.tabs.executeScript(null, {
@@ -81,7 +81,7 @@ function main(tab){
 }
 function afterParse(data){
     window['G']=data;
-    console.log(data);
+    //console.log(data);
     chrome.extension.onRequest.removeListener(afterParse);
 
     chrome.extension.onRequest.addListener(afterList);
@@ -92,7 +92,7 @@ function afterParse(data){
 }
 function afterList(data){
     window['L']=data;
-    console.log(data);
+   // console.log(data);
     chrome.extension.onRequest.removeListener(afterList);
 
     fusion();
@@ -101,8 +101,8 @@ function fusion(){
     var G=window['G'].courseTable;
     var L=window['L'];
     window['W1MON']=null;
-    console.log(G);
-    console.log(L);
+    //console.log(G);
+    //console.log(L);
     
     //A[w][d][p][seq]=week-expanded G[d][p][seq]
     var A=new Array(16+1);
@@ -145,8 +145,8 @@ function fusion(){
         }
     }
 
-    console.log(A);
-    console.log(B);
+    //console.log(A);
+    //console.log(B);
     
     //Now B should match L in order(i.e. flattened L is subsequence of B)
     //Go through B in reverse order and match B as much as possible
@@ -245,7 +245,7 @@ function upload(){
                 var f=F[d][p][name];
 
                 var offset=new goog.date.Interval();
-                offset.days=(f.week[0]-1)*7+d-1;
+                offset.days=d-1;
                 var dt=new goog.date.DateTime(W1MON);
                 dt.add(offset);
                 var startDateTime=new goog.date.DateTime(dt);
@@ -255,21 +255,16 @@ function upload(){
                 endDateTime.setHours(f.endTime.getHours());
                 endDateTime.setMinutes(f.endTime.getMinutes());
 
-                var recur='';
-                if(f.week.length>1){
-                    var allDate=new Array(f.week.length-1);
-                    for(var i=1, ie=f.week.length;i<ie;i++){
-                        var w=f.week[i];
-                        offset.days=(w-1)*7+d-1;
-                        var dW=new goog.date.Date(W1MON);
-                        dW.add(offset);
-                        allDate[i-1]=dW.toIsoString();
-                    }
-                    recur='RDATE;VALUE=DATE:'+allDate.join(',');
+                var nWeek=new Array(16+1);
+                for(var w=1;w<=16;w++){
+                    nWeek[w]=true;
+                }
+                for(var i=0, ie=f.week.length;i<ie;i++){
+                    nWeek[f.week[i]]=false;
                 }
 
                 //pending to create
-                FC.push([f, startDateTime, endDateTime, recur]);
+                FC.push([f, startDateTime, endDateTime, nWeek]);
             }
         }
     }
@@ -277,8 +272,15 @@ function upload(){
     authorize(afterAuthorize);
 }
 function afterAuthorize(){
+    var match=/^(\d+)-(\d+)-(\d+)/.exec(window['termId']);
+    var termName='THU:'+match[1]+'-'+match[2];
+    switch(parseInt(match[2])){
+        case 1: termName+='秋'; break;
+        case 2: termName+='春'; break;
+        case 3: termName+='夏'; break;
+    }
     createCalendar(
-        'THU:'+/^(\d+-\d+)/.exec(window['termId'])[1]+'['+(new goog.date.DateTime()).toIsoString()+']',
+        termName+'['+(new goog.date.DateTime()).toIsoString()+']',
         afterCalendarReady
     );
 }
@@ -290,17 +292,30 @@ function uploadFC(){
     if(window['FC'] && window['FC'].length){
         console.log(window['FC'].length);
         var fc=window['FC'].pop();
-        createEvent(window['calendarId'], fc[0], fc[1], fc[2], function(o){
-            uploadFCRecur(o.id, fc[3]);
-        });
+        uploadFC1(fc);
     }
 }
-function uploadFCRecur(eventId, recur){
-    if(recur && recur!==''){
-        patchEventRecurrence(window['calendarId'], eventId, recur, function(o){
-            setTimeout(uploadFC, 10);
-        });
-    }else{
-        setTimeout(uploadFC, 10);
+function uploadFC1(fc){
+    createEvent(window['calendarId'], fc[0], fc[1], fc[2], function(o){
+        uploadFC2(fc, o.id);
+    });
+}
+function uploadFC2(fc, id){
+    listEventInstance(window['calendarId'], id, function(o){
+        uploadFC3(fc, id, o.items);
+    });
+}
+function uploadFC3(fc, id, items){
+    var nWeek=fc[3];
+    for(var i=1;i<=16;i++){
+        if(nWeek[i]){
+            uploadFC3_1(i, items[i-1].id);
+        }
     }
+    setTimeout(uploadFC, 600);
+}
+function uploadFC3_1(i, id){
+    setTimeout(function(){
+        cancelEventInstance(window['calendarId'], id);
+    }, 800/16*(i-1));
 }
