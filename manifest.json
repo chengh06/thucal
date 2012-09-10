@@ -20,5 +20,11 @@
         "https://accounts.google.com/",
         "https://www.google.com/"
     ],
-    "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'"
+    "content_security_policy": "script-src 'self' https://apis.google.com; object-src 'self'",
+    "web_accessible_resources": [
+        "chrome_ex_oauth.html",
+        "chrome_ex_oauth.js",
+        "chrome_ex_oauth_extra.js",
+        "chrome_ex_oauthsimple.js"
+    ]
 }

@@ -39,13 +39,13 @@ function parseWeek(weekStr){
                 match=/^\d+$/.exec(rangeStr);
                 if(match!==null){
                     //isolated week#
-                    ret.push(parseInt(match[0]));
+                    ret.push(parseInt(match[0]), 10);
                 }
                 match=/^(\d+)-(\d+)$/.exec(rangeStr);
                 if(match!==null){
                     //week# range
-                    var wBegin=parseInt(match[1]);
-                    var wEnd=parseInt(match[2]);
+                    var wBegin=parseInt(match[1], 10);
+                    var wEnd=parseInt(match[2], 10);
                     for(var w=wBegin;w<=wEnd;w++){
                         ret.push(w);
                     }

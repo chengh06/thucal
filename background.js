@@ -16,8 +16,8 @@ function correctDay(googDay){
 //returns: goog.date.Date
 function decodeDateFromParts(dateParts){
     var d=new goog.date.Date();
-    var month=parseInt(dateParts[0]);
-    var date=parseInt(dateParts[1]);
+    var month=parseInt(dateParts[0], 10);
+    var date=parseInt(dateParts[1], 10);
     d.setMonth(month-1); //caveat: setMonth takes [0, 11]
     d.setDate(date);
 
@@ -32,8 +32,8 @@ function decodeDateFromParts(dateParts){
 function decodeDateTime(d, str){
     var match=/(\d+):(\d+)/.exec(str);
     if(match===null) throw Error('这不科学！decodeDateTime');
-    var hour=parseInt(match[1]);
-    var minute=parseInt(match[2]);
+    var hour=parseInt(match[1], 10);
+    var minute=parseInt(match[2], 10);
 
     //date time hacks, assuming Beijing(Tsinghua can't teleport lah)
     var dt=goog.date.fromIsoString(d.toIsoString()+'T'+'000000+0800');
@@ -274,7 +274,7 @@ function upload(){
 function afterAuthorize(){
     var match=/^(\d+)-(\d+)-(\d+)/.exec(window['termId']);
     var termName='THU:'+match[1]+'-'+match[2];
-    switch(parseInt(match[2])){
+    switch(parseInt(match[2], 10)){
         case 1: termName+='秋'; break;
         case 2: termName+='春'; break;
         case 3: termName+='夏'; break;
