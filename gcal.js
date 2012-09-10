@@ -35,8 +35,6 @@ var oauth = ChromeExOAuth.initBackgroundPage({
 });
 
 
-function authorized(){
-}
 function authorize(callback){
     oauth.authorize(callback);
 }
@@ -59,7 +57,9 @@ function authXhr(method, url, g, p, callback){
 function createCalendar(name, callback){
     //authorize(function(){
         authXhr('POST', 'https://www.googleapis.com/calendar/v3/calendars',
-            {},
+            {
+                'fields': 'id'
+            },
             JSON.stringify({
                 'summary': name,
                 'timeZone': 'Asia/Shanghai',
@@ -73,11 +73,10 @@ function createCalendar(name, callback){
     //});
 }
 
-function createEvent(calendarId, data, startDateTime, endDateTime, callback){
+function createEvent(calendarId, data, startDateTime, endDateTime, /*recur,*/ callback){
     //authorize(function(){
-        authXhr('POST', 'https://www.googleapis.com/calendar/v3/calendars/'+esc(calendarId)+'/events',
-            {},
-            JSON.stringify({
+        var data=
+        {
                 'start':{
                     'dateTime': correctDateTime(startDateTime),
                     'timeZone': 'Asia/Shanghai'
@@ -89,7 +88,13 @@ function createEvent(calendarId, data, startDateTime, endDateTime, callback){
                 'summary': data.name,
                 'location': data.loc,
                 'description': data.info
-            }),
+        };
+        //if(recur && recur!=='') data.recurrence=recur;
+        authXhr('POST', 'https://www.googleapis.com/calendar/v3/calendars/'+esc(calendarId)+'/events',
+            {
+                'fields': 'id'
+            },
+            JSON.stringify(data),
             function(r){
                 var o=JSON.parse(r);
                 if(callback) callback(o);
@@ -98,20 +103,13 @@ function createEvent(calendarId, data, startDateTime, endDateTime, callback){
     //});
 }
 
-/*
-function updateEvent(calendarId, eventId, startDateTime, endDateTime, recurrence, callback){
-    authorize(function(){
-        authXhr('PUT', 'https://www.googleapis.com/calendar/v3/calendars/'+esc(calendarId)+ '/events/'+esc(eventId),
-            {},
+function patchEventRecurrence(calendarId, eventId, recurrence, callback){
+    //authorize(function(){
+        authXhr('PATCH', 'https://www.googleapis.com/calendar/v3/calendars/'+esc(calendarId)+ '/events/'+esc(eventId),
+            {
+                //'fields': 'id'
+            },
             JSON.stringify({
-                'start':{
-                    'dateTime': correctDateTime(startDateTime),
-                    'timeZone': 'Asia/Shanghai'
-                },
-                'end':{
-                    'dateTime': correctDateTime(endDateTime),
-                    'timeZone': 'Asia/Shanghai'
-                },
                 recurrence: recurrence
             }),
             function(r){
@@ -121,6 +119,5 @@ function updateEvent(calendarId, eventId, startDateTime, endDateTime, recurrence
                 }
             }
         );
-    });
+    //});
 }
-*/

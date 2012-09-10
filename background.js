@@ -234,7 +234,46 @@ function match(Ldate, Lside, Gside){
 }
 
 //Create calendar based on window['W1MON'] and window['F'][d][p][name]
+//Fills into window['FC'] for upload
 function upload(){
+    var W1MON=window['W1MON'];
+    var F=window['F'];
+    var FC=[];
+    for(var d=1;d<=7;d++){
+        for(var p=1;p<=6;p++){
+            for(var name in F[d][p]){
+                var f=F[d][p][name];
+
+                var offset=new goog.date.Interval();
+                offset.days=(f.week[0]-1)*7+d-1;
+                var dt=new goog.date.DateTime(W1MON);
+                dt.add(offset);
+                var startDateTime=new goog.date.DateTime(dt);
+                startDateTime.setHours(f.startTime.getHours());
+                startDateTime.setMinutes(f.startTime.getMinutes());
+                var endDateTime=new goog.date.DateTime(dt);
+                endDateTime.setHours(f.endTime.getHours());
+                endDateTime.setMinutes(f.endTime.getMinutes());
+
+                var recur='';
+                if(f.week.length>1){
+                    var allDate=new Array(f.week.length-1);
+                    for(var i=1, ie=f.week.length;i<ie;i++){
+                        var w=f.week[i];
+                        offset.days=(w-1)*7+d-1;
+                        var dW=new goog.date.Date(W1MON);
+                        dW.add(offset);
+                        allDate[i-1]=dW.toIsoString();
+                    }
+                    recur='RDATE;VALUE=DATE:'+allDate.join(',');
+                }
+
+                //pending to create
+                FC.push([f, startDateTime, endDateTime, recur]);
+            }
+        }
+    }
+    window['FC']=FC;
     authorize(afterAuthorize);
 }
 function afterAuthorize(){
@@ -244,41 +283,24 @@ function afterAuthorize(){
     );
 }
 function afterCalendarReady(o){
-    var W1MON=window['W1MON'];
-    var F=window['F'];
-    var FC=[];
-    for(var d=1;d<=7;d++){
-        for(var p=1;p<=6;p++){
-            for(var name in F[d][p]){
-                var f=F[d][p][name];
-                for(var i=0, ie=f.week.length;i<ie;i++){
-                    var w=f.week[i];
-
-                    //handle event timing
-                    var offset=new goog.date.Interval();
-                    offset.days=(w-1)*7+d-1;
-                    var dt=new goog.date.DateTime(W1MON);
-                    dt.add(offset);
-                    var startDateTime=new goog.date.DateTime(dt);
-                    startDateTime.setHours(f.startTime.getHours());
-                    startDateTime.setMinutes(f.startTime.getMinutes());
-                    var endDateTime=new goog.date.DateTime(dt);
-                    endDateTime.setHours(f.endTime.getHours());
-                    endDateTime.setMinutes(f.endTime.getMinutes());
-
-                    //pending to create
-                    FC.push([o.id, f,startDateTime, endDateTime]);
-                }
-            }
-        }
-    }
-    window['FC']=FC;
+    window['calendarId']=o.id;
     uploadFC();
 }
 function uploadFC(){
     if(window['FC'] && window['FC'].length){
         console.log(window['FC'].length);
         var fc=window['FC'].pop();
-        createEvent(fc[0], fc[1], fc[2], fc[3], function(){setTimeout(uploadFC, 100);});
+        createEvent(window['calendarId'], fc[0], fc[1], fc[2], function(o){
+            uploadFCRecur(o.id, fc[3]);
+        });
+    }
+}
+function uploadFCRecur(eventId, recur){
+    if(recur && recur!==''){
+        patchEventRecurrence(window['calendarId'], eventId, recur, function(o){
+            setTimeout(uploadFC, 10);
+        });
+    }else{
+        setTimeout(uploadFC, 10);
     }
 }
